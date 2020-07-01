@@ -5,9 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"os"
+
+	"github.com/urfave/cli/v2"
 )
 
 // ExtensionMoh is a nested object in the Ubity extension API dataset. It doesn't
@@ -63,15 +67,42 @@ type Extension struct {
 const extensionID int = -1 // TODO: Read from command line argument
 
 func main() {
-	var extensionURL string = fmt.Sprintf("https://studio.ubity.com/extensions_api/%v", extensionID)
+
+	app := &cli.App{
+		Name:  "ubdater",
+		Usage: "Ubity update tool",
+		Flags: []cli.Flag{
+			&cli.IntFlag{
+				Name:     "extension",
+				Aliases:  []string{"e"},
+				Usage:    "the extension to modify",
+				Required: true,
+			},
+		},
+		Action: func(c *cli.Context) error {
+			updateExtension(c.Int("extension"))
+			return nil
+		},
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func updateExtension(extension int) {
+	fmt.Println("Updating extension", extension)
+
+	var extensionURL string = fmt.Sprintf("https://studio.ubity.com/extensions_api/%v", extension)
 	fmt.Printf("API URL: %s\n", extensionURL)
 
 	cookieJar, _ := cookiejar.New(nil)
 
 	requestBody := url.Values{}
-	// TODO, read login credentials from somewhere. Env variable?
-	requestBody.Set("login", "TODO_USERNAME")
-	requestBody.Set("password", "TODO_PASSWORD")
+	requestBody.Set("login", os.Getenv("UBITY_LOGIN"))
+	requestBody.Set("password", os.Getenv("UBITY_PASSWORD"))
 
 	client := &http.Client{
 		Jar: cookieJar,
@@ -93,7 +124,6 @@ func main() {
 		extAttributes := Extension{}
 		json.Unmarshal(bodyBytes, &extAttributes)
 
-		// fmt.Printf("Number currently set to %s\n", extAttributes)
 		fmt.Printf("Number currently set to %s\n", extAttributes.ForwardTo)
 
 		extAttributes.ForwardTo = "TODO_NEW_FORWARD_NO"
