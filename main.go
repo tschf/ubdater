@@ -64,8 +64,6 @@ type Extension struct {
 	NumLines             int          `json:"nb_lines"`
 }
 
-const extensionID int = -1 // TODO: Read from command line argument
-
 func main() {
 
 	app := &cli.App{
