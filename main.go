@@ -78,9 +78,15 @@ func main() {
 				Usage:    "the extension to modify",
 				Required: true,
 			},
+			&cli.StringFlag{
+				Name:     "forward-to",
+				Aliases:  []string{"f"},
+				Usage:    "the forward to number",
+				Required: true,
+			},
 		},
 		Action: func(c *cli.Context) error {
-			updateExtension(c.Int("extension"))
+			updateExtension(c.Int("extension"), c.String("forward-to"))
 			return nil
 		},
 	}
@@ -92,7 +98,7 @@ func main() {
 
 }
 
-func updateExtension(extension int) {
+func updateExtension(extension int, forwardNum string) {
 	fmt.Println("Updating extension", extension)
 
 	var extensionURL string = fmt.Sprintf("https://studio.ubity.com/extensions_api/%v", extension)
@@ -126,12 +132,14 @@ func updateExtension(extension int) {
 
 		fmt.Printf("Number currently set to %s\n", extAttributes.ForwardTo)
 
-		extAttributes.ForwardTo = "TODO_NEW_FORWARD_NO"
+		extAttributes.ForwardTo = forwardNum
 		extAttributes.Moh.Name = "default"
 		extAttributes.Moh.Description = "default"
 		extAttributes.NumLines = 10
 
 		modifiedPayload, _ := json.Marshal(extAttributes)
+
+		fmt.Println(string(modifiedPayload))
 
 		updateReq, _ := http.NewRequest(http.MethodPut, extensionURL, bytes.NewBuffer(modifiedPayload))
 
