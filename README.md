@@ -42,4 +42,4 @@ Trent Schafer, (C) 2020
 
 ## Liecense
 
-This tool is licensed under ..
+This tool is licensed under MPL-2.0: Mozilla Public Licene, 2.0
