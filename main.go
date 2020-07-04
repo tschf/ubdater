@@ -137,8 +137,6 @@ func updateExtension(extension int, forwardNum string) {
 
 		modifiedPayload, _ := json.Marshal(extAttributes)
 
-		fmt.Println(string(modifiedPayload))
-
 		updateReq, _ := http.NewRequest(http.MethodPut, extensionURL, bytes.NewBuffer(modifiedPayload))
 
 		updateResp, _ := client.Do(updateReq)
